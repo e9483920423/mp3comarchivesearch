@@ -235,11 +235,7 @@ export default function SearchInterface() {
           />
           <span className="text-sm font-medium text-gray-700 w-12 text-right">{globalVolume}%</span>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          {selectedCollections.includes("all")
-            ? "Viewing all collections in random order. Select specific collections to enable alphabetical sorting."
-            : `Viewing ${selectedCollections.length} collection${selectedCollections.length > 1 ? "s" : ""}. Adjust sort order and volume. Only one track can play at a time.`}
-        </p>
+        
       </div>
 
       <TrackList

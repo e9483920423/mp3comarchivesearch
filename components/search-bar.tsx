@@ -30,7 +30,7 @@ export default function SearchBar({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search entire archive (263,440 tracks)..."
+            placeholder="Search entire archive..."
             className="w-full pl-10 pr-4 py-3 border-2 border-[--color-border] rounded-lg focus:outline-none focus:border-[--color-primary] transition-colors"
           />
         </div>
@@ -81,7 +81,7 @@ export default function SearchBar({
             </span>
           ) : (
             <span>
-              <strong>{totalTracks.toLocaleString()}</strong> tracks in archive
+              <strong>{totalTracks.toLocaleString()}</strong> tracks
             </span>
           )}
         </div>

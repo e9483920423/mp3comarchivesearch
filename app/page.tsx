@@ -8,7 +8,7 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-6xl">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-2">MP3.com Archive Search</h1>
           <p className="text-center text-white/90 text-sm md:text-base">
-            Search the MP3.com archive by track title or artist!
+            Search the MP3.com Internet Archive! ~( °٢° )~
           </p>
         </div>
       </header>

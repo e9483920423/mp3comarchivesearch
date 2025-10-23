@@ -18,8 +18,7 @@ export default function NoticeBanner() {
         <X className="w-5 h-5" />
       </button>
       <p className="text-(--color-notice-text) text-sm md:text-base pr-8">
-        <strong>Notice:</strong> This site indexes MP3 files from the Internet Archive's MP3.com Rescue Barge
-        collection. All files are hosted externally by the Internet Archive.
+        <strong>Notice:</strong> This site indexes the Internet Archive's MP3.com Rescue Barge collection. All files are hosted externally by the Internet Archive, with songs belonging to their respective owners. Inspired by mp3.xo.tel, built with JavaScript, Next.js, and Tailwind CSS, with open source in mind.
       </p>
     </div>
   )
