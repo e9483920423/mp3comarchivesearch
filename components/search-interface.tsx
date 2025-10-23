@@ -181,7 +181,7 @@ export default function SearchInterface() {
   if (isLoading) {
     return (
       <div className="text-center py-12">
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200"></div>
+        <div className="rounded-lg shadow-sm p-4 border border-gray-200 mb-2.5"></div>
         <p className="mt-4 text-gray-600">
           {isSearching ? "Searching entire archive..." : "Loading tracks from archive..."}
         </p>
@@ -218,31 +218,10 @@ export default function SearchInterface() {
         isSearching={isSearching}
       />
 
-      <div className="rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
+      <div className="rounded-lg shadow-sm p-4 border border-gray-200 mb-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <Filter className="w-5 h-5 text-gray-700" />
-              <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Collections:</label>
-              <button
-                onClick={() => setIsCollectionDropdownOpen(!isCollectionDropdownOpen)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm text-left flex items-center justify-between"
-              >
-                <span className="truncate">
-                  {selectedCollections.includes("all")
-                    ? "All Collections (Random)"
-                    : `${selectedCollections.length} selected`}
-                </span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${isCollectionDropdownOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
+            
 
             {isCollectionDropdownOpen && (
               <div className="relative">

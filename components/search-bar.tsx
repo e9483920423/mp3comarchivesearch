@@ -22,7 +22,7 @@ export default function SearchBar({
   isSearching = false,
 }: SearchBarProps) {
   return (
-    <div className="bg-[--color-card] rounded-lg shadow-sm p-6 mb-6 bg-gray-300">
+    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-3">
       <div className="flex items-center gap-3 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[--color-text-muted]" />
