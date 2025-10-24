@@ -23,7 +23,7 @@ export default function NoticeBanner() {
           href="https://mp3.xo.tel/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-blue-700 underline decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium text-rose-800"
+          className="hover:text-blue-700 decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium text-rose-800"
         >
           mp3.xo.tel
         </a>
@@ -32,7 +32,7 @@ export default function NoticeBanner() {
           href="https://github.com/e9483920423/mp3comarchivesearch"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-blue-700 underline decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium text-rose-800"
+          className="hover:text-blue-700 decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium text-rose-800"
         >
           open source
         </a>{" "}
