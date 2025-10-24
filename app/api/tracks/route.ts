@@ -18,6 +18,7 @@ export async function GET(request: Request) {
     let countQuery = supabase.from("tracks").select("*", { count: "exact", head: true })
     let tracksQuery = supabase.from("tracks").select("*")
 
+    // Filter by collection(s)
     if (collectionsParam !== "all") {
       const collections = collectionsParam.split(",").filter(Boolean)
       if (collections.length > 0) {
@@ -45,14 +46,12 @@ export async function GET(request: Request) {
 
     // Get total count
     const { count, error: countError } = await countQuery
+    if (countError) throw countError
 
-    if (countError) {
-      throw countError
-    }
-
+    // Sort order logic
     if (collectionsParam === "all") {
-      // Random order for 'all' collection
-      tracksQuery = tracksQuery.order("id", { ascending: true }) // Use id for consistent pagination
+      // Random order handled directly in Supabase/Postgres
+      tracksQuery = tracksQuery.order("random()", { ascending: true })
     } else {
       // Alphabetical order by artist for specific collections
       tracksQuery = tracksQuery.order("artist", { ascending: sortOrder === "asc" })
@@ -60,25 +59,12 @@ export async function GET(request: Request) {
 
     // Get paginated tracks
     const { data: tracks, error: tracksError } = await tracksQuery.range(offset, offset + limit - 1)
+    if (tracksError) throw tracksError
 
-    if (tracksError) {
-      throw tracksError
-    }
-
-    let finalTracks = tracks || []
-    if (collectionsParam === "all" && finalTracks.length > 0) {
-      // Fisher-Yates shuffle algorithm for true randomization
-      finalTracks = [...finalTracks]
-      for (let i = finalTracks.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[finalTracks[i], finalTracks[j]] = [finalTracks[j], finalTracks[i]]
-      }
-    }
-
-    console.log(`[v0] Loaded ${finalTracks.length} tracks (total: ${count})`)
+    console.log(`[v0] Loaded ${tracks?.length ?? 0} tracks (total: ${count})`)
 
     return NextResponse.json({
-      tracks: finalTracks,
+      tracks: tracks || [],
       total: count || 0,
       page,
       limit,
