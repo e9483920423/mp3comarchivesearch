@@ -27,7 +27,7 @@ export default function NoticeBanner() {
         >
           mp3.xo.tel
         </a>
-        , built with JavaScript, Next.js, and Tailwind CSS, with{" "}
+        , built with TypeScript, Next.js, and Tailwind CSS, with{" "}
         <a
           href="https://github.com/e9483920423/mp3comarchivesearch"
           target="_blank"
