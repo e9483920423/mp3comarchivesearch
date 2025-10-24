@@ -17,7 +17,7 @@ export default function NoticeBanner() {
       >
         <X className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
-      <p className="text-gray-700 text-xs sm:text-sm md:text-base pr-10 sm:pr-12 leading-relaxed">
+      <p className="text-gray-700 text-xs sm:text-sm md:text-base pr-10 sm:pr-12 leading-relaxed font-extrabold">
         <strong className="font-semibold text-gray-900">Notice:</strong> This site indexes the Internet Archive's MP3.com Rescue Barge collection. All files are hosted externally by the Internet Archive, with songs belonging to their respective owners. Inspired by{" "}
         <a
           href="https://mp3.xo.tel/"

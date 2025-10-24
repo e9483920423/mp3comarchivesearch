@@ -35,7 +35,7 @@ export default function TrackList({
   }
 
   return (
-    <div className="rounded-lg shadow-sm p-3 sm:p-6 border border-gray-200 bg-stone-50">
+    <div className="rounded-lg shadow-sm p-3 sm:p-6 border border-gray-200 bg-zinc-200">
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
         {totalInDatabase > 0
           ? `Showing ${displayTracks.length.toLocaleString()} of ${totalInDatabase.toLocaleString()} Tracks`
