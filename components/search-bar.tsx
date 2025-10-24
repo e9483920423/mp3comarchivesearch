@@ -37,7 +37,7 @@ export default function SearchBar({
         <div className="relative flex-1 group">
           <div className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200/60 group-focus-within:from-red-50 group-focus-within:to-red-100/50 group-focus-within:border-red-200 transition-all duration-200">
             <Search
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 cursor-pointer hover:text-red-600 transition-colors active:scale-95 group-focus-within:text-red-600"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 cursor-pointer hover:text-red-600 transition-colors active:scale-95 group-focus-within:text-red-600 text-red-800"
               onClick={onSearch}
             />
           </div>
@@ -65,7 +65,7 @@ export default function SearchBar({
                 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 accent-red-600 cursor-pointer"
               />
             </div>
-            <span className="select-none font-medium text-gray-700 group-hover:text-gray-900 transition-colors whitespace-nowrap">Both</span>
+            <span className="select-none font-medium group-hover:text-gray-900 transition-colors whitespace-nowrap text-black">Both</span>
           </label>
           <label className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer touch-manipulation group min-w-0">
             <div className="relative flex-shrink-0">
@@ -78,7 +78,7 @@ export default function SearchBar({
                 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 accent-red-600 cursor-pointer"
               />
             </div>
-            <span className="select-none font-medium text-gray-700 group-hover:text-gray-900 transition-colors whitespace-nowrap">Artist</span>
+            <span className="select-none font-medium group-hover:text-gray-900 transition-colors whitespace-nowrap text-black">Artist</span>
           </label>
           <label className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer touch-manipulation group min-w-0">
             <div className="relative flex-shrink-0">
@@ -91,7 +91,7 @@ export default function SearchBar({
                 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 accent-red-600 cursor-pointer"
               />
             </div>
-            <span className="select-none font-medium text-gray-700 group-hover:text-gray-900 transition-colors whitespace-nowrap">Title</span>
+            <span className="select-none font-medium group-hover:text-gray-900 transition-colors whitespace-nowrap text-black">Title</span>
           </label>
         </div>
 
@@ -102,8 +102,8 @@ export default function SearchBar({
               {filteredCount < totalTracks && ` (showing ${filteredCount.toLocaleString()})`}
             </span>
           ) : (
-            <span className="tracking-wide block">
-              <strong className="text-gray-900 font-semibold">{totalTracks.toLocaleString()}</strong> tracks
+            <span className="tracking-wide block text-red-600">
+              <strong className="font-semibold text-red-800">{totalTracks.toLocaleString()}</strong> tracks
             </span>
           )}
         </div>

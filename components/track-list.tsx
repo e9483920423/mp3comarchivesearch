@@ -36,7 +36,7 @@ export default function TrackList({
 
   return (
     <div className="rounded-lg shadow-sm p-3 sm:p-6 border border-gray-200 bg-zinc-200">
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-black">
         {totalInDatabase > 0
           ? `Showing ${displayTracks.length.toLocaleString()} of ${totalInDatabase.toLocaleString()} Tracks`
           : `${displayTracks.length.toLocaleString()} Track${displayTracks.length === 1 ? "" : "s"}`}
@@ -68,7 +68,7 @@ export default function TrackList({
                 `Load More (${(totalInDatabase - displayTracks.length).toLocaleString()} left)`
               )}
             </button>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">
+            <p className="text-xs sm:text-sm mt-2 text-black">
               {displayTracks.length.toLocaleString()} of {totalInDatabase.toLocaleString()} tracks
             </p>
           </div>

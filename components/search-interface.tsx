@@ -214,9 +214,9 @@ export default function SearchInterface() {
       <div className="rounded-xl shadow-sm p-4 sm:p-5 border border-gray-200/80 bg-gradient-to-br from-white to-gray-50/30 mb-3 hover:border-gray-300 transition-colors duration-200 max-w-full overflow-hidden">
         <div className="flex items-center gap-3 sm:gap-4 w-full">
           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200/60 flex-shrink-0">
-            <Volume2 className="w-4 h-4 text-gray-700" />
+            <Volume2 className="w-4 h-4 text-red-800" />
           </div>
-          <label className="text-xs sm:text-sm font-semibold text-gray-800 whitespace-nowrap tracking-wide flex-shrink-0">
+          <label className="text-xs sm:text-sm font-semibold whitespace-nowrap tracking-wide flex-shrink-0 text-black">
             Volume
           </label>
           <input
@@ -228,7 +228,7 @@ export default function SearchInterface() {
             className="flex-1 min-w-0 max-w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-red-600 touch-manipulation hover:accent-red-700 transition-all"
             title={`Global volume: ${globalVolume}%`}
           />
-          <span className="text-xs sm:text-sm font-semibold text-gray-700 w-11 sm:w-12 text-right tabular-nums flex-shrink-0">
+          <span className="text-xs sm:text-sm font-semibold w-11 sm:w-12 text-right tabular-nums flex-shrink-0 text-red-800">
             {globalVolume}%
           </span>
         </div>

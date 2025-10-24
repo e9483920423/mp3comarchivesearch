@@ -15,7 +15,7 @@ export default function NoticeBanner() {
         className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 hover:bg-gray-200/60 rounded-lg transition-all duration-200 touch-manipulation p-1.5"
         aria-label="Close notice"
       >
-        <X className="w-4 h-4 sm:w-5 sm:h-5" />
+        <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-800" />
       </button>
       <p className="text-gray-700 text-xs sm:text-sm md:text-base pr-10 sm:pr-12 leading-relaxed font-extrabold">
         <strong className="font-semibold text-gray-900">Notice:</strong> This site indexes the Internet Archive's MP3.com Rescue Barge collection. All files are hosted externally by the Internet Archive, with songs belonging to their respective owners. Inspired by{" "}
@@ -23,7 +23,7 @@ export default function NoticeBanner() {
           href="https://mp3.xo.tel/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-700 underline decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium"
+          className="hover:text-blue-700 underline decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium text-rose-800"
         >
           mp3.xo.tel
         </a>
@@ -32,7 +32,7 @@ export default function NoticeBanner() {
           href="https://github.com/e9483920423/mp3comarchivesearch"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-700 underline decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium"
+          className="hover:text-blue-700 underline decoration-blue-400/50 hover:decoration-blue-600 underline-offset-2 transition-colors duration-200 break-words font-medium text-rose-800"
         >
           open source
         </a>{" "}
