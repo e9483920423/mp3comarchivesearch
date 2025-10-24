@@ -104,7 +104,6 @@ export default function SearchInterface() {
 
   const handleSearch = useCallback(() => {
     if (!searchQuery.trim()) {
-      // If search is cleared, reload all tracks
       setIsLoading(true)
       loadTracks(1)
       return
@@ -168,9 +167,14 @@ export default function SearchInterface() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="rounded-lg shadow-sm p-4 border border-gray-200 mb-2.5"></div>
-        <p className="mt-4 text-gray-600">
+      <div className="text-center py-16">
+        <div className="rounded-xl shadow-sm p-6 border border-gray-200/80 bg-gradient-to-br from-white to-gray-50/50 mb-3 max-w-md mx-auto">
+          <div className="animate-pulse">
+            <div className="h-3 bg-gray-200 rounded-full w-3/4 mx-auto mb-3"></div>
+            <div className="h-3 bg-gray-200 rounded-full w-1/2 mx-auto"></div>
+          </div>
+        </div>
+        <p className="mt-5 text-gray-600 font-medium tracking-wide">
           {isSearching ? "Searching entire archive..." : "Loading tracks from archive..."}
         </p>
       </div>
@@ -179,13 +183,13 @@ export default function SearchInterface() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-600">
-          <p className="font-semibold text-lg">Error loading archive</p>
-          <p className="text-sm mt-2">{error}</p>
+      <div className="text-center py-16">
+        <div className="text-red-600 max-w-md mx-auto">
+          <p className="font-semibold text-lg tracking-tight">Error loading archive</p>
+          <p className="text-sm mt-2 text-gray-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="mt-6 px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:from-red-700 hover:to-red-600 shadow-sm hover:shadow-md transition-all duration-200 font-medium"
           >
             Retry
           </button>
@@ -207,20 +211,22 @@ export default function SearchInterface() {
         onSearch={handleSearch}
       />
 
-      <div className="rounded-lg shadow-sm p-3 sm:p-4 border border-gray-200 mb-2">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Volume2 className="w-5 h-5 flex-shrink-0 text-gray-700" />
-          <label className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">Volume:</label>
+      <div className="rounded-xl shadow-sm p-4 sm:p-5 border border-gray-200/80 bg-gradient-to-br from-white to-gray-50/30 mb-3 hover:border-gray-300 transition-colors duration-200">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200/60">
+            <Volume2 className="w-4 h-4 text-gray-700" />
+          </div>
+          <label className="text-xs sm:text-sm font-semibold text-gray-800 whitespace-nowrap tracking-wide">Volume</label>
           <input
             type="range"
             min="0"
             max="100"
             value={globalVolume}
             onChange={(e) => setGlobalVolume(Number(e.target.value))}
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600 touch-manipulation"
+            className="flex-1 h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-red-600 touch-manipulation hover:accent-red-700 transition-all"
             title={`Global volume: ${globalVolume}%`}
           />
-          <span className="text-xs sm:text-sm font-medium text-gray-700 w-10 sm:w-12 text-right">{globalVolume}%</span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-700 w-11 sm:w-12 text-right tabular-nums">{globalVolume}%</span>
         </div>
       </div>
 

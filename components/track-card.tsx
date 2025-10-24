@@ -17,7 +17,6 @@ export default function TrackCard({ track, globalVolume, currentlyPlayingId, onT
 
   useEffect(() => {
     if (audioRef.current) {
-      // Combine global and local volume (both are 0-100, convert to 0-1)
       const combinedVolume = (globalVolume / 100) * (localVolume / 100)
       audioRef.current.volume = combinedVolume
     }
@@ -55,27 +54,35 @@ export default function TrackCard({ track, globalVolume, currentlyPlayingId, onT
   }, [track.id, currentlyPlayingId, onTrackPlay])
 
   return (
-    <div className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow bg-white">
-      <div className="mb-2 sm:mb-3">
-        <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-1 break-words">
+    <div className="group border border-gray-200/80 rounded-xl p-4 sm:p-5 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 bg-white/80 backdrop-blur-sm">
+      <div className="mb-3 sm:mb-4">
+        <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-1.5 break-words leading-tight tracking-tight">
           {track.artist || "Unknown Artist"}
         </h3>
-        <p className="text-sm sm:text-base text-gray-600 break-words">{track.title || "Unknown Title"}</p>
+        <p className="text-sm sm:text-base text-gray-500 break-words leading-relaxed">
+          {track.title || "Unknown Title"}
+        </p>
       </div>
 
-      {track.collection && <div className="mb-2 sm:mb-3"></div>}
+      {track.collection && <div className="mb-3 sm:mb-4"></div>}
 
-      <audio ref={audioRef} controls className="w-full mb-2 sm:mb-3" preload="none" src={track.url}>
+      <audio 
+        ref={audioRef} 
+        controls 
+        className="w-full mb-3 sm:mb-4 rounded-lg" 
+        preload="none" 
+        src={track.url}
+      >
         Your browser does not support the audio element.
       </audio>
 
       <a
         href={track.url}
         download={`${track.artist || "Unknown"} - ${track.title || "Unknown"}.mp3`}
-        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors text-sm font-medium w-full touch-manipulation"
+        className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 sm:py-2.5 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 active:from-green-800 active:to-green-700 shadow-sm hover:shadow-md transition-all duration-200 text-sm font-medium w-full touch-manipulation group-hover:scale-[1.01]"
       >
         <Download className="w-4 h-4 flex-shrink-0" />
-        <span>Open MP3</span>
+        <span className="tracking-wide">Open MP3</span>
       </a>
     </div>
   )
