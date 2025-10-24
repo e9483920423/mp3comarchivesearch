@@ -18,7 +18,6 @@ export async function GET(request: Request) {
     let countQuery = supabase.from("tracks").select("*", { count: "exact", head: true })
     let tracksQuery = supabase.from("tracks").select("*")
 
-    // Filter by collection(s)
     if (collectionsParam !== "all") {
       const collections = collectionsParam.split(",").filter(Boolean)
       if (collections.length > 0) {
@@ -46,29 +45,91 @@ export async function GET(request: Request) {
 
     // Get total count
     const { count, error: countError } = await countQuery
-    if (countError) throw countError
 
-    // Sort order logic
-    if (collectionsParam === "all") {
-      // Random order handled directly in Supabase/Postgres
-      tracksQuery = tracksQuery.order("random()", { ascending: true })
-    } else {
-      // Alphabetical order by artist for specific collections
-      tracksQuery = tracksQuery.order("artist", { ascending: sortOrder === "asc" })
+    if (countError) {
+      throw countError
     }
 
-    // Get paginated tracks
-    const { data: tracks, error: tracksError } = await tracksQuery.range(offset, offset + limit - 1)
-    if (tracksError) throw tracksError
+    const totalCount = count || 0
+    const totalPages = Math.ceil(totalCount / limit)
 
-    console.log(`[v0] Loaded ${tracks?.length ?? 0} tracks (total: ${count})`)
+    let finalTracks: any[] = []
+
+    // If searching, use traditional pagination
+    if (query.trim()) {
+      tracksQuery = tracksQuery.order("artist", { ascending: sortOrder === "asc" })
+      const { data: tracks, error: tracksError } = await tracksQuery.range(offset, offset + limit - 1)
+
+      if (tracksError) {
+        throw tracksError
+      }
+
+      finalTracks = tracks || []
+    } else {
+      // Random multi-page loading for browsing
+      // Randomly select 3-5 pages to fetch from (or fewer if not enough pages exist)
+      const numPagesToFetch = Math.min(3, totalPages)
+      const randomPages = new Set<number>()
+
+      // Generate unique random page numbers
+      while (randomPages.size < numPagesToFetch && randomPages.size < totalPages) {
+        const randomPage = Math.floor(Math.random() * totalPages) + 1
+        randomPages.add(randomPage)
+      }
+
+      console.log(`[v0] Fetching from ${numPagesToFetch} random pages: ${Array.from(randomPages).join(", ")}`)
+
+      // Fetch tracks from each random page
+      const fetchPromises = Array.from(randomPages).map(async (pageNum) => {
+        const pageOffset = (pageNum - 1) * limit
+        const pageQuery = supabase.from("tracks").select("*")
+
+        // Apply same collection filters
+        if (collectionsParam !== "all") {
+          const collections = collectionsParam.split(",").filter(Boolean)
+          if (collections.length > 0) {
+            pageQuery.in("collection", collections)
+          }
+        }
+
+        // Use id ordering for consistent pagination
+        pageQuery.order("id", { ascending: true })
+
+        const { data, error } = await pageQuery.range(pageOffset, pageOffset + limit - 1)
+
+        if (error) {
+          console.error(`[v0] Error fetching page ${pageNum}:`, error)
+          return []
+        }
+
+        return data || []
+      })
+
+      // Wait for all pages to be fetched
+      const pagesData = await Promise.all(fetchPromises)
+
+      // Combine all tracks from different pages
+      const combinedTracks = pagesData.flat()
+
+      // Fisher-Yates shuffle algorithm for true randomization across all fetched pages
+      finalTracks = [...combinedTracks]
+      for (let i = finalTracks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[finalTracks[i], finalTracks[j]] = [finalTracks[j], finalTracks[i]]
+      }
+
+      // Limit to requested page size
+      finalTracks = finalTracks.slice(0, limit)
+    }
+
+    console.log(`[v0] Loaded ${finalTracks.length} tracks (total: ${totalCount})`)
 
     return NextResponse.json({
-      tracks: tracks || [],
-      total: count || 0,
+      tracks: finalTracks,
+      total: totalCount,
       page,
       limit,
-      hasMore: (count || 0) > offset + limit,
+      hasMore: totalCount > offset + limit,
       query: query || null,
       searchBy: searchBy || null,
       collections: collectionsParam,
