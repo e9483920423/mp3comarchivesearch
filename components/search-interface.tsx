@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import SearchBar from "./search-bar"
 import TrackList from "./track-list"
 import type { Track } from "@/types/track"
-import { Volume2, Filter, ArrowUpDown, X } from "lucide-react"
+import { Volume2 } from "lucide-react"
 
 export default function SearchInterface() {
   const [tracks, setTracks] = useState<Track[]>([])
@@ -18,7 +18,6 @@ export default function SearchInterface() {
   const [hasMore, setHasMore] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
-  const [searchDebounceTimer, setSearchDebounceTimer] = useState<NodeJS.Timeout | null>(null)
   const [collections, setCollections] = useState<string[]>([])
   const [selectedCollections, setSelectedCollections] = useState<string[]>(["all"])
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
@@ -103,29 +102,18 @@ export default function SearchInterface() {
     loadTracks(1)
   }, [loadTracks])
 
-  useEffect(() => {
-    if (searchDebounceTimer) {
-      clearTimeout(searchDebounceTimer)
-    }
-
+  const handleSearch = useCallback(() => {
     if (!searchQuery.trim()) {
+      // If search is cleared, reload all tracks
       setIsLoading(true)
       loadTracks(1)
       return
     }
 
-    const timer = setTimeout(() => {
-      console.log("[v0] Executing database search:", searchQuery)
-      setIsLoading(true)
-      loadTracks(1, searchQuery, searchPreference)
-    }, 500)
-
-    setSearchDebounceTimer(timer)
-
-    return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [searchQuery, searchPreference])
+    console.log("[v0] Executing database search:", searchQuery)
+    setIsLoading(true)
+    loadTracks(1, searchQuery, searchPreference)
+  }, [searchQuery, searchPreference, loadTracks])
 
   async function loadMoreTracks() {
     if (isLoadingMore || !hasMore) return
@@ -207,7 +195,7 @@ export default function SearchInterface() {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <SearchBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -216,26 +204,24 @@ export default function SearchInterface() {
         totalTracks={totalTracks}
         filteredCount={tracks.length}
         isSearching={isSearching}
+        onSearch={handleSearch}
       />
 
-      <div className="rounded-lg shadow-sm p-4 border border-gray-200 mb-2">
-        
-
-        <div className="flex items-center gap-3">
-          <Volume2 className="w-5 h-5 text-gray-700" />
-          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Global Volume:</label>
+      <div className="rounded-lg shadow-sm p-3 sm:p-4 border border-gray-200 mb-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Volume2 className="w-5 h-5 flex-shrink-0 text-gray-700" />
+          <label className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">Volume:</label>
           <input
             type="range"
             min="0"
             max="100"
             value={globalVolume}
             onChange={(e) => setGlobalVolume(Number(e.target.value))}
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600 touch-manipulation"
             title={`Global volume: ${globalVolume}%`}
           />
-          <span className="text-sm font-medium text-gray-700 w-12 text-right">{globalVolume}%</span>
+          <span className="text-xs sm:text-sm font-medium text-gray-700 w-10 sm:w-12 text-right">{globalVolume}%</span>
         </div>
-        
       </div>
 
       <TrackList

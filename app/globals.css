@@ -126,6 +126,15 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
+  /* Prevent horizontal overflow on mobile */
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Ensure all containers respect viewport width */
+html {
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -135,4 +144,32 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Optimize audio controls for mobile */
+audio {
+  width: 100%;
+  height: 40px;
+}
+
+@media (max-width: 640px) {
+  audio {
+    height: 48px;
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  input[type="radio"],
+  input[type="range"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+  }
 }

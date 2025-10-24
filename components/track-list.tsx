@@ -28,20 +28,20 @@ export default function TrackList({
 
   if (tracks.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-12 text-center border border-gray-200">
-        <p className="text-gray-600 text-lg">No tracks found. Try a different search query.</p>
+      <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center border border-gray-200">
+        <p className="text-gray-600 text-base sm:text-lg">No tracks found. Try a different search query.</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-lg shadow-sm p-6 border border-gray-200 bg-stone-50">
-      <h2 className="text-xl font-semibold mb-4 text-gray-900">
+    <div className="rounded-lg shadow-sm p-3 sm:p-6 border border-gray-200 bg-stone-50">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
         {totalInDatabase > 0
           ? `Showing ${displayTracks.length.toLocaleString()} of ${totalInDatabase.toLocaleString()} Tracks`
           : `${displayTracks.length.toLocaleString()} Track${displayTracks.length === 1 ? "" : "s"}`}
       </h2>
-      <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
+      <div className="space-y-3 sm:space-y-4 overflow-y-auto">
         {displayTracks.map((track, index) => (
           <TrackCard
             key={`${track.url}-${index}`}
@@ -53,24 +53,23 @@ export default function TrackList({
         ))}
 
         {hasMore && onLoadMore && (
-          <div className="text-center py-6 border-t border-gray-200">
+          <div className="text-center py-4 sm:py-6 border-t border-gray-200">
             <button
               onClick={onLoadMore}
               disabled={isLoadingMore}
-              className="px-8 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base touch-manipulation w-full sm:w-auto"
             >
               {isLoadingMore ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Loading more tracks...
+                  Loading...
                 </span>
               ) : (
-                `Load More Tracks (${(totalInDatabase - displayTracks.length).toLocaleString()} remaining)`
+                `Load More (${(totalInDatabase - displayTracks.length).toLocaleString()} left)`
               )}
             </button>
-            <p className="text-sm text-gray-500 mt-2">
-              Currently showing {displayTracks.length.toLocaleString()} of {totalInDatabase.toLocaleString()} total
-              tracks
+            <p className="text-xs sm:text-sm text-gray-500 mt-2">
+              {displayTracks.length.toLocaleString()} of {totalInDatabase.toLocaleString()} tracks
             </p>
           </div>
         )}
