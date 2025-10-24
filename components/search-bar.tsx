@@ -102,7 +102,7 @@ export default function SearchBar({
               {filteredCount < totalTracks && ` (showing ${filteredCount.toLocaleString()})`}
             </span>
           ) : (
-            <span className="tracking-wide block text-red-600">
+            <span className="tracking-wide block text-red-500">
               <strong className="font-semibold text-red-800">{totalTracks.toLocaleString()}</strong> tracks
             </span>
           )}
