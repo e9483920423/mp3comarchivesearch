@@ -3,7 +3,7 @@
 
 ## Overview
 
-This project indexes the Internet Archive's MP3.com Rescue Barge collection, making it easilly searchable. 
+This project indexes the Internet Archive's MP3.com Rescue Barge collection, making it easily searchable. 
 All files are hosted externally by the Internet Archive, and songs belong to their respective owners.
 
 Inspired by mp3.xo.tel, this site is built with:
