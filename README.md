@@ -24,10 +24,9 @@ Vercel:
 2. **Set Up Supabase**  
    - Connent Supabase as an integration with your vercel deployment (Vercel will prompt for environment variables this is fine).  
    - In the Supabase dashboard, go to the SQL Editor and run the following query to disable Row Level Security (RLS) for scraping:  
-     \`\`\`sql
+     ```sql
      ALTER TABLE public.tracks DISABLE ROW LEVEL SECURITY;
-     ALTER TABLE public.scrape_metadata DISABLE ROW LEVEL SECURITY;
-     \`\`\`  
+     ALTER TABLE public.scrape_metadata DISABLE ROW LEVEL SECURITY; 
      Expected output: *Success. No rows returned*.
 
 3. 1. **Clone or Fork the Repository**
