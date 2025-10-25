@@ -1,30 +1,44 @@
-# mp3comarchivesearch6
-
-*Automatically synced with your [v0.app](https://v0.app) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/kits4leak/v0-mp3comarchivesearch6)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/faPXZA8WVQZ)
+# MP3.com Internet Archive MP3.com Rescue Barge collection search
+[mp3.drumkits4.me](https://mp3.drumkits4.me/)
 
 ## Overview
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+This project indexes the Internet Archive's MP3.com Rescue Barge collection, making it easilly searchable. 
+All files are hosted externally by the Internet Archive, and songs belong to their respective owners.
 
-## Deployment
+Inspired by mp3.xo.tel, this site is built with:
 
-Your project is live at:
+- TypeScript
+- Next.js
+- Tailwind CSS
 
-**[https://vercel.com/kits4leak/v0-mp3comarchivesearch6](https://vercel.com/kits4leak/v0-mp3comarchivesearch6)**
+## How to fork & deploy:
 
-## Build your app
+Follow these steps to fork the repository and deploy your own instance. I assume you have a GitHub account and familiar with Vercel and Supabase.
 
-Continue building your app on:
+Fork Repo or [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fe9483920423%2Fmp3comarchivesearch&env=SUPABASE_POSTGRES_PRISMA_URL%2CSUPABASE_URL%2CNEXT_PUBLIC_SUPABASE_URL%2CSUPABASE_POSTGRES_URL_NON_POOLING%2CSUPABASE_JWT_SECRET%2CSUPABASE_POSTGRES_USER%2CNEXT_PUBLIC_SUPABASE_ANON_KEY%2CSUPABASE_POSTGRES_PASSWORD%2CSUPABASE_POSTGRES_DATABASE%2CSUPABASE_SERVICE_ROLE_KEY%2CSUPABASE_POSTGRES_HOST%2CSUPABASE_ANON_KEY%2CSUPABASE_POSTGRES_URL)
 
-**[https://v0.app/chat/projects/faPXZA8WVQZ](https://v0.app/chat/projects/faPXZA8WVQZ)**
+Vercel:
+1: Create & connect a Supabase account to your project.
 
-## How It Works
+2. **Set Up Supabase**  
+   - Connent Supabase as an integration with your vercel deployment (Vercel will prompt for environment variables this is fine).  
+   - In the Supabase dashboard, go to the SQL Editor and run the following query to disable Row Level Security (RLS) for scraping:  
+     ```sql
+     ALTER TABLE public.tracks DISABLE ROW LEVEL SECURITY;
+     ALTER TABLE public.scrape_metadata DISABLE ROW LEVEL SECURITY;
+     ```  
+     Expected output: *Success. No rows returned*.
 
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+3. 1. **Clone or Fork the Repository**
+Download [scrapeddata.zip](https://github.com/e9483920423/mp3comarchivesearch/tree/main/public/data) 
+
+4. 4. **Upload Data to Supabase**  
+   - Unzip `scrapeddata.zip` to access `scrape_metadata_rows.csv` and `tracks_rows.csv`.  
+   - In the Supabase dashboard, open the Table Editor.  
+   - Upload `scrape_metadata_rows.csv` to the `scrape_metadata` table.  
+   - Upload `tracks_rows.csv` to the `tracks` table.  
+   - Wait for the uploads to complete.
+
+Your instance should be live. 
+If you encounter issues, check the Vercel and Supabase logs for errors.
