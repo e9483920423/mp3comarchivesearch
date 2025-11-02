@@ -1,37 +1,37 @@
-import type { Metadata } from 'next'
+import type React from "react"
+import type { Metadata, Viewport } from "next"
+import { JetBrains_Mono } from "next/font/google"
+import "./globals.css"
 
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
-import { Inter as V0_Font_Inter, IBM_Plex_Mono as V0_Font_IBM_Plex_Mono } from 'next/font/google'
-
-// Initialize fonts
-const _inter = V0_Font_Inter({ subsets: ['latin'], weight: ["100","200","300","400","500","600","700","800","900"] })
-const _ibmPlexMono = V0_Font_IBM_Plex_Mono({ subsets: ['latin'], weight: ["100","200","300","400","500","600","700"] })
+// Load JetBrains Mono from Google Fonts
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"], // optional: add weights you need
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: 'FL SHORTCUTS',
-  description: 'Complete FL Studio keyboard shortcuts reference with voting system',
-  generator: 'v0.app',
+  title: "MP3.com Archive Search",
+  description: "Search the MP3.com archive by track title or artist",
+  generator: "v0.app",
 }
 
-export const viewport = {
-  width: 'device-width',
+export const viewport: Viewport = {
+  width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={`font-mono antialiased overscroll-none`}>
-        {children}
-        <Analytics />
-      </body>
+      {/* Apply JetBrains Mono globally */}
+      <body className={jetbrains.className}>{children}</body>
     </html>
   )
 }

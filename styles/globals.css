@@ -123,9 +123,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-@layer utilities {
-  .duration-5500 {
-    transition: background-color 5.5s ease-out, border-color 5.5s ease-out, box-shadow 1.5s ease-out;
-  }
-}

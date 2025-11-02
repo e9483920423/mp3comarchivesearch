@@ -3,7 +3,7 @@
 
 ## Overview
 
-This project indexes the Internet Archive's MP3.com Rescue Barge collection, making it easily searchable. 
+This project indexes the Internet Archive's MP3.com Rescue Barge collection, making it easilly searchable. 
 All files are hosted externally by the Internet Archive, and songs belong to their respective owners.
 
 Inspired by mp3.xo.tel, this site is built with:
@@ -24,9 +24,10 @@ Vercel:
 2. **Set Up Supabase**  
    - Connent Supabase as an integration with your vercel deployment (Vercel will prompt for environment variables this is fine).  
    - In the Supabase dashboard, go to the SQL Editor and run the following query to disable Row Level Security (RLS) for scraping:  
-     ```sql
+     \`\`\`sql
      ALTER TABLE public.tracks DISABLE ROW LEVEL SECURITY;
-     ALTER TABLE public.scrape_metadata DISABLE ROW LEVEL SECURITY; 
+     ALTER TABLE public.scrape_metadata DISABLE ROW LEVEL SECURITY;
+     \`\`\`  
      Expected output: *Success. No rows returned*.
 
 3. 1. **Clone or Fork the Repository**
