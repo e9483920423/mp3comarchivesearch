@@ -3,7 +3,10 @@ import NoticeBanner from "@/components/notice-banner"
 
 export default function Home() {
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-neutral-900 via-neutral-950 to-black relative">
+    <main className="min-h-screen w-full overflow-x-hidden relative">
+      {/* Improved gradient background with cave effect */}
+      <div className="absolute inset-0 bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-900"></div>
+
       {/* 2000s-style ambient background glow */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute top-0 left-0 w-96 h-96 bg-rose-900 rounded-full blur-3xl"></div>
