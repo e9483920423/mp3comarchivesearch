@@ -3,6 +3,7 @@
 import { Download } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import type { Track } from "@/types/track"
+import { useTrackMetadata } from "@/hooks/use-track-metadata"
 
 interface TrackCardProps {
   track: Track
@@ -14,6 +15,7 @@ interface TrackCardProps {
 export default function TrackCard({ track, globalVolume, currentlyPlayingId, onTrackPlay }: TrackCardProps) {
   const [localVolume, setLocalVolume] = useState(100)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const { displayName, isLoading } = useTrackMetadata(track.url, track.artist, track.title)
 
   useEffect(() => {
     if (audioRef.current) {
@@ -56,29 +58,27 @@ export default function TrackCard({ track, globalVolume, currentlyPlayingId, onT
   return (
     <div className="group border border-gray-200/80 rounded-xl p-4 sm:p-5 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 bg-white/80 backdrop-blur-sm">
       <div className="mb-3 sm:mb-4">
-        <h3 className="font-semibold text-base sm:text-lg mb-1.5 break-words leading-tight tracking-tight text-black">
-          {track.artist || "Unknown Artist"}
+        <h3
+          className={`font-semibold text-base sm:text-lg mb-1.5 break-words leading-tight tracking-tight text-black ${
+            isLoading ? "opacity-60" : "opacity-100"
+          } transition-opacity`}
+        >
+          {displayName}
         </h3>
         <p className="text-sm sm:text-base break-words leading-relaxed text-neutral-950">
-          {track.title || "Unknown Title"}
+          {track.collection || "Unknown Collection"}
         </p>
       </div>
 
       {track.collection && <div className="mb-3 sm:mb-4"></div>}
 
-      <audio 
-        ref={audioRef} 
-        controls 
-        className="w-full mb-3 sm:mb-4 rounded-lg" 
-        preload="none" 
-        src={track.url}
-      >
+      <audio ref={audioRef} controls className="w-full mb-3 sm:mb-4 rounded-lg" preload="none" src={track.url}>
         Your browser does not support the audio element.
       </audio>
 
       <a
         href={track.url}
-        download={`${track.artist || "Unknown"} - ${track.title || "Unknown"}.mp3`}
+        download={`${displayName}.mp3`}
         className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 sm:py-2.5 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 active:from-green-800 active:to-green-700 shadow-sm hover:shadow-md transition-all duration-200 text-sm font-medium w-full touch-manipulation group-hover:scale-[1.01]"
       >
         <Download className="w-4 h-4 flex-shrink-0" />

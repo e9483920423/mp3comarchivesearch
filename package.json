@@ -44,6 +44,7 @@
     "cmdk": "latest",
     "embla-carousel-react": "latest",
     "fs": "latest",
+    "http": "latest",
     "https": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",

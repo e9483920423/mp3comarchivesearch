@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createServiceRoleClient } from "@/lib/supabase/server"
+import { processBatchMetadata, saveProcessedTracks } from "@/lib/metadata/batch-processor"
 
 interface Track {
   id: string
@@ -116,9 +117,13 @@ function parseArchiveHTML(html: string, baseURL: string): Track[] {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const limit = searchParams.get("limit") ? Number.parseInt(searchParams.get("limit")!) : 5
+  const extractID3 = searchParams.get("extractID3") !== "false"
+  const formatTitles = searchParams.get("formatTitles") !== "false"
+  const normalizeArtists = searchParams.get("normalizeArtists") !== "false"
 
   console.log("[v0] Starting scrape process...")
   console.log(`[v0] Scraping first ${limit} URLs from mp3index.txt`)
+  console.log(`[v0] Metadata processing: ID3=${extractID3}, Format=${formatTitles}, Normalize=${normalizeArtists}`)
 
   try {
     const supabase = await createServiceRoleClient()
@@ -137,7 +142,7 @@ export async function GET(request: Request) {
 
     console.log(`[v0] Found ${urls.length} URLs to scrape`)
 
-    const allTracks: Track[] = []
+    const allTracks: any[] = []
     const errors: string[] = []
 
     for (let i = 0; i < urls.length; i++) {
@@ -173,24 +178,20 @@ export async function GET(request: Request) {
     console.log(`[v0] Scraping complete! Total tracks: ${allTracks.length}`)
 
     if (allTracks.length > 0) {
+      console.log("[v0] Processing metadata...")
+      const processedTracks = await processBatchMetadata(allTracks, {
+        extractID3,
+        formatTitles,
+        normalizeArtists,
+      })
+
       console.log("[v0] Saving tracks to Supabase...")
+      const { saved, errors: saveErrors } = await saveProcessedTracks(processedTracks)
 
-      // Insert tracks in batches of 1000 to avoid payload limits
-      const batchSize = 1000
-      for (let i = 0; i < allTracks.length; i += batchSize) {
-        const batch = allTracks.slice(i, i + batchSize)
-        const { error: insertError } = await supabase.from("tracks").upsert(batch, { onConflict: "id" })
-
-        if (insertError) {
-          console.error("[v0] Error inserting batch:", insertError)
-          errors.push(`Database error: ${insertError.message}`)
-        } else {
-          console.log(`[v0] Saved batch ${i / batchSize + 1} (${batch.length} tracks)`)
-        }
-      }
+      errors.push(...saveErrors)
 
       const { error: metadataError } = await supabase.from("scrape_metadata").insert({
-        total_tracks: allTracks.length,
+        total_tracks: saved,
         urls_scraped: urls.length,
         status: "completed",
       })
