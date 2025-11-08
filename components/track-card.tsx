@@ -57,7 +57,7 @@ export default function TrackCard({ track, globalVolume, currentlyPlayingId, onT
     <div className="group border border-gray-200/80 rounded-xl p-4 sm:p-5 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 bg-white/80 backdrop-blur-sm">
       <div className="mb-3 sm:mb-4">
         <h3 className="font-semibold text-base sm:text-lg mb-1.5 break-words leading-tight tracking-tight text-black">
-          {track.artist && track.artist !== "Unknown Artist" ? `${track.artist} - ${track.title}` : track.title}
+          {track.artist && track.artist !== "Unknown Artist" ? `${track.artist} ${track.title}` : track.title}
         </h3>
         <p className="text-sm sm:text-base break-words leading-relaxed text-neutral-950">
           {track.filename || "Unknown Filename"} | {track.collection || "Unknown Collection"}
