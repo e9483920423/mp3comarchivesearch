@@ -60,7 +60,7 @@ export default function TrackCard({ track, globalVolume, currentlyPlayingId, onT
           {track.artist && track.artist !== "Unknown Artist" ? `${track.artist} - ${track.title}` : track.title}
         </h3>
         <p className="text-sm sm:text-base break-words leading-relaxed text-neutral-950">
-          {track.collection || "Unknown Collection"}
+          {track.filename || "Unknown Filename"} | {track.collection || "Unknown Collection"}
         </p>
       </div>
 
