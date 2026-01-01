@@ -23,7 +23,7 @@ export async function GET() {
       collections: uniqueCollections,
     })
   } catch (error) {
-    console.error("[v0] Error fetching collections:", error)
+    console.error("Error fetching collections:", error)
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Failed to fetch collections",

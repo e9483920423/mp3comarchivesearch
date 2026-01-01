@@ -26,7 +26,6 @@ export async function GET(request: Request) {
       }
     }
 
-    // Apply search filters if query exists
     if (query.trim()) {
       const searchTerm = `%${query.trim()}%`
 
@@ -43,7 +42,6 @@ export async function GET(request: Request) {
       }
     }
 
-    // Get total count
     const { count, error: countError } = await countQuery
 
     if (countError) {
@@ -55,7 +53,6 @@ export async function GET(request: Request) {
 
     let finalTracks: any[] = []
 
-    // If searching, use traditional pagination
     if (query.trim()) {
       tracksQuery = tracksQuery.order("artist", { ascending: sortOrder === "asc" })
       const { data: tracks, error: tracksError } = await tracksQuery.range(offset, offset + limit - 1)
@@ -66,11 +63,9 @@ export async function GET(request: Request) {
 
       finalTracks = tracks || []
     } else {
-      // Randomly select 2-3 pages to fetch from (reduced from 3-5 for mobile)
       const numPagesToFetch = Math.min(2, totalPages)
       const randomPages = new Set<number>()
 
-      // Generate unique random page numbers
       while (randomPages.size < numPagesToFetch && randomPages.size < totalPages) {
         const randomPage = Math.floor(Math.random() * totalPages) + 1
         randomPages.add(randomPage)
@@ -78,12 +73,10 @@ export async function GET(request: Request) {
 
       const mobileLimit = Math.min(limit, 100)
 
-      // Fetch tracks from each random page
       const fetchPromises = Array.from(randomPages).map(async (pageNum) => {
         const pageOffset = (pageNum - 1) * mobileLimit
         const pageQuery = supabase.from("tracks").select("*")
 
-        // Apply same collection filters
         if (collectionsParam !== "all") {
           const collections = collectionsParam.split(",").filter(Boolean)
           if (collections.length > 0) {
@@ -91,7 +84,6 @@ export async function GET(request: Request) {
           }
         }
 
-        // Use id ordering for consistent pagination
         pageQuery.order("id", { ascending: true })
 
         const { data, error } = await pageQuery.range(pageOffset, pageOffset + mobileLimit - 1)
@@ -106,14 +98,8 @@ export async function GET(request: Request) {
       const timeoutPromise = new Promise<any[][]>((_, reject) => {
         setTimeout(() => reject(new Error("Request timeout")), 25000)
       })
-
-      // Wait for all pages to be fetched with timeout
       const pagesData = await Promise.race([Promise.all(fetchPromises), timeoutPromise])
-
-      // Combine all tracks from different pages
       const combinedTracks = pagesData.flat()
-
-      // Fisher-Yates shuffle algorithm for true randomization across all fetched pages
       finalTracks = [...combinedTracks]
       for (let i = finalTracks.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
@@ -137,12 +123,12 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
-      console.error("[v0] Error fetching tracks:", error)
+      console.error("Error fetching tracks:", error)
     }
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Failed to fetch tracks",
-        tracks: [], // Return empty array instead of undefined to prevent crashes
+        tracks: [],
         total: 0,
         hasMore: false,
       },

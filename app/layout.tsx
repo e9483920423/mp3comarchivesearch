@@ -3,10 +3,9 @@ import type { Metadata, Viewport } from "next"
 import { JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 
-// Load JetBrains Mono from Google Fonts
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "700"], // optional: add weights you need
+  weight: ["400", "500", "700"], 
   display: "swap",
 })
 

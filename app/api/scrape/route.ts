@@ -121,9 +121,9 @@ export async function GET(request: Request) {
   const formatTitles = searchParams.get("formatTitles") !== "false"
   const normalizeArtists = searchParams.get("normalizeArtists") !== "false"
 
-  console.log("[v0] Starting scrape process...")
-  console.log(`[v0] Scraping first ${limit} URLs from mp3index.txt`)
-  console.log(`[v0] Metadata processing: ID3=${extractID3}, Format=${formatTitles}, Normalize=${normalizeArtists}`)
+  console.log("Starting scrape process...")
+  console.log(`Scraping first ${limit} URLs from mp3index.txt`)
+  console.log(`Metadata processing: ID3=${extractID3}, Format=${formatTitles}, Normalize=${normalizeArtists}`)
 
   try {
     const supabase = await createServiceRoleClient()
@@ -140,14 +140,14 @@ export async function GET(request: Request) {
       .filter((url) => url.trim())
       .slice(0, limit)
 
-    console.log(`[v0] Found ${urls.length} URLs to scrape`)
+    console.log(`Found ${urls.length} URLs to scrape`)
 
     const allTracks: any[] = []
     const errors: string[] = []
 
     for (let i = 0; i < urls.length; i++) {
       const url = urls[i]
-      console.log(`[v0] [${i + 1}/${urls.length}] Scraping: ${url}`)
+      console.log(`[${i + 1}/${urls.length}] Scraping: ${url}`)
 
       try {
         const response = await fetch(url, {
@@ -163,29 +163,29 @@ export async function GET(request: Request) {
         const html = await response.text()
         const tracks = parseArchiveHTML(html, url)
 
-        console.log(`[v0] Found ${tracks.length} valid MP3 tracks from ${url}`)
+        console.log(`Found ${tracks.length} valid MP3 tracks from ${url}`)
         allTracks.push(...tracks)
 
         // Add delay to avoid overwhelming Archive.org
         await new Promise((resolve) => setTimeout(resolve, 1000))
       } catch (error) {
         const errorMsg = `Error scraping ${url}: ${error instanceof Error ? error.message : "Unknown error"}`
-        console.error(`[v0] ${errorMsg}`)
+        console.error(`${errorMsg}`)
         errors.push(errorMsg)
       }
     }
 
-    console.log(`[v0] Scraping complete! Total tracks: ${allTracks.length}`)
+    console.log(`Scraping complete! Total tracks: ${allTracks.length}`)
 
     if (allTracks.length > 0) {
-      console.log("[v0] Processing metadata...")
+      console.log("Processing metadata...")
       const processedTracks = await processBatchMetadata(allTracks, {
         extractID3,
         formatTitles,
         normalizeArtists,
       })
 
-      console.log("[v0] Saving tracks to Supabase...")
+      console.log("Saving tracks to Supabase...")
       const { saved, errors: saveErrors } = await saveProcessedTracks(processedTracks)
 
       errors.push(...saveErrors)
@@ -197,10 +197,10 @@ export async function GET(request: Request) {
       })
 
       if (metadataError) {
-        console.error("[v0] Error updating metadata:", metadataError)
+        console.error("Error updating metadata:", metadataError)
       }
 
-      console.log("[v0] Database save complete!")
+      console.log("Database save complete!")
     }
 
     return NextResponse.json({
@@ -210,7 +210,7 @@ export async function GET(request: Request) {
       errors: errors.length > 0 ? errors : undefined,
     })
   } catch (error) {
-    console.error("[v0] Scrape error:", error)
+    console.error("Scrape error:", error)
     return NextResponse.json(
       {
         success: false,

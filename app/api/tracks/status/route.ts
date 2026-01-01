@@ -21,7 +21,7 @@ export async function GET() {
       .maybeSingle()
 
     if (metadataError) {
-      console.error("[v0] Error fetching metadata:", metadataError)
+      console.error("Error fetching metadata:", metadataError)
     }
 
     return NextResponse.json({
@@ -30,7 +30,7 @@ export async function GET() {
       needsScraping: (count || 0) === 0,
     })
   } catch (error) {
-    console.error("[v0] Error checking status:", error)
+    console.error("Error checking status:", error)
     return NextResponse.json({
       totalTracks: 0,
       lastScraped: null,
