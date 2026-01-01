@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { JetBrains_Mono } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
 const jetbrains = JetBrains_Mono({
@@ -30,7 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       {}
-      <body className={jetbrains.className}>{children}</body>
+      <body className={jetbrains.className}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
