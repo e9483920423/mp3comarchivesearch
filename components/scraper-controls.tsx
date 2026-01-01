@@ -30,7 +30,7 @@ export function ScraperControls() {
         const data = await response.json()
         setDbStatus(data)
       } catch (err) {
-        console.error("[v0] Error checking database status:", err)
+        console.error("Error checking database status:", err)
       }
     }
     checkStatus()

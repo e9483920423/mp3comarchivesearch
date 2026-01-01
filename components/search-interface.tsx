@@ -35,7 +35,7 @@ export default function SearchInterface() {
           setCollections(data.collections || [])
         }
       } catch (err) {
-        console.error("[v0] Error loading collections:", err)
+        console.error("Error loading collections:", err)
       }
     }
     loadCollections()
@@ -47,7 +47,7 @@ export default function SearchInterface() {
         const isSearch = Boolean(query?.trim())
         const collectionsParam = selectedCollections.includes("all") ? "all" : selectedCollections.join(",")
 
-        console.log(`[v0] ${isSearch ? "Searching" : "Loading"} tracks...`, {
+        console.log(`${isSearch ? "Searching" : "Loading"} tracks...`, {
           page,
           query,
           searchBy,
@@ -76,7 +76,7 @@ export default function SearchInterface() {
         const data = await response.json()
         const trackData = data.tracks || []
 
-        console.log(`[v0] ${isSearch ? "Search returned" : "Loaded"} ${trackData.length} tracks (total: ${data.total})`)
+        console.log(`${isSearch ? "Search returned" : "Loaded"} ${trackData.length} tracks (total: ${data.total})`)
 
         if (append) {
           setTracks((prev) => [...prev, ...trackData])
@@ -90,7 +90,7 @@ export default function SearchInterface() {
         setIsSearching(isSearch)
         setIsLoading(false)
       } catch (err) {
-        console.error("[v0] Error loading tracks:", err)
+        console.error("Error loading tracks:", err)
         setError(err instanceof Error ? err.message : "Failed to load tracks")
         setIsLoading(false)
       }
@@ -109,7 +109,7 @@ export default function SearchInterface() {
       return
     }
 
-    console.log("[v0] Executing database search:", searchQuery)
+    console.log("Executing database search:", searchQuery)
     setIsLoading(true)
     loadTracks(1, searchQuery, searchPreference)
   }, [searchQuery, searchPreference, loadTracks])
@@ -127,7 +127,7 @@ export default function SearchInterface() {
         true,
       )
     } catch (err) {
-      console.error("[v0] Error loading more tracks:", err)
+      console.error("Error loading more tracks:", err)
     } finally {
       setIsLoadingMore(false)
     }
