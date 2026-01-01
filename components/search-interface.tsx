@@ -139,13 +139,17 @@ export default function SearchInterface() {
         return ["all"]
       }
 
-      const withoutAll = prev.filter((c) => c !== "all")
+      // If "all" is currently selected, replace it with the clicked collection
+      if (prev.includes("all")) {
+        return [collection]
+      }
 
-      if (withoutAll.includes(collection)) {
-        const newSelections = withoutAll.filter((c) => c !== collection)
+      // Toggle the collection
+      if (prev.includes(collection)) {
+        const newSelections = prev.filter((c) => c !== collection)
         return newSelections.length === 0 ? ["all"] : newSelections
       } else {
-        return [...withoutAll, collection]
+        return [...prev, collection]
       }
     })
 
@@ -293,8 +297,7 @@ export default function SearchInterface() {
                       type="checkbox"
                       checked={!selectedCollections.includes("all") && selectedCollections.includes(collection)}
                       onChange={() => handleCollectionToggle(collection)}
-                      disabled={selectedCollections.includes("all")}
-                      className="w-4 h-4 text-red-600 accent-red-600 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-4 h-4 text-red-600 accent-red-600 rounded cursor-pointer"
                     />
                     <span className="text-sm text-black font-medium">Collection: {collection}</span>
                   </label>
