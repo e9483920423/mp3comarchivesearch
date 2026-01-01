@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import SearchBar from "./search-bar"
 import TrackList from "./track-list"
 import type { Track } from "@/types/track"
-import { Volume2 } from "lucide-react"
+import { Volume2, Filter, X, ChevronDown } from "lucide-react"
 
 export default function SearchInterface() {
   const [tracks, setTracks] = useState<Track[]>([])
@@ -232,6 +232,92 @@ export default function SearchInterface() {
             {globalVolume}%
           </span>
         </div>
+      </div>
+
+      <div className="rounded-xl shadow-sm p-4 sm:p-5 border border-gray-200/80 bg-gradient-to-br from-white to-gray-50/30 mb-3 hover:border-gray-300 transition-colors duration-200">
+        <div className="flex items-center gap-3 sm:gap-4 mb-4">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200/60 flex-shrink-0">
+            <Filter className="w-4 h-4 text-red-800" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-semibold tracking-wide text-black">Filter by Collection</h3>
+          {!selectedCollections.includes("all") && selectedCollections.length > 0 && (
+            <button
+              onClick={handleClearFilters}
+              className="ml-auto text-xs font-medium text-red-600 hover:text-red-700 transition-colors flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              Clear
+            </button>
+          )}
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={() => setIsCollectionDropdownOpen(!isCollectionDropdownOpen)}
+            className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm border-2 border-gray-200 rounded-lg hover:border-red-300 focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100/50 transition-all duration-200 bg-white"
+          >
+            <span className="text-black font-medium">
+              {selectedCollections.includes("all")
+                ? "All Collections"
+                : selectedCollections.length === 1
+                  ? `Collection: ${selectedCollections[0]}`
+                  : `${selectedCollections.length} Collections Selected`}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 text-red-800 transition-transform duration-200 ${
+                isCollectionDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {isCollectionDropdownOpen && (
+            <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+              <div className="p-2">
+                <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={selectedCollections.includes("all")}
+                    onChange={() => handleCollectionToggle("all")}
+                    className="w-4 h-4 text-red-600 accent-red-600 rounded cursor-pointer"
+                  />
+                  <span className="text-sm font-medium text-black">All Collections</span>
+                  <span className="ml-auto text-xs text-gray-500 font-medium">{totalTracks.toLocaleString()}</span>
+                </label>
+                <div className="border-t border-gray-200 my-2"></div>
+                {collections.map((collection) => (
+                  <label
+                    key={collection}
+                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!selectedCollections.includes("all") && selectedCollections.includes(collection)}
+                      onChange={() => handleCollectionToggle(collection)}
+                      disabled={selectedCollections.includes("all")}
+                      className="w-4 h-4 text-red-600 accent-red-600 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <span className="text-sm text-black font-medium">Collection: {collection}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {!selectedCollections.includes("all") && selectedCollections.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {selectedCollections.map((collection) => (
+              <button
+                key={collection}
+                onClick={() => handleCollectionToggle(collection)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors"
+              >
+                {collection}
+                <X className="w-3 h-3" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <TrackList
