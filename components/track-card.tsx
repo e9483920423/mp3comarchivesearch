@@ -53,15 +53,13 @@ export default function TrackCard({
 
     const handleEnded = () => {
       console.log("[v0] Track ended:", track.id)
-      // Clear the currently playing track
       onTrackPlay(null)
 
-      // Auto-play next track if available
       if (nextTrackId && onPlayNext) {
         console.log("[v0] Auto-playing next track:", nextTrackId)
         setTimeout(() => {
           onPlayNext()
-        }, 300) // Small delay for smooth transition
+        }, 300)
       } else {
         console.log("[v0] No next track available, playback stopped")
       }
@@ -97,7 +95,8 @@ export default function TrackCard({
           {track.artist && track.artist !== "Unknown Artist" ? `${track.artist} ${track.title}` : track.title}
         </h3>
         <p className="text-sm sm:text-base break-words leading-relaxed text-neutral-950">
-          {track.filename || "Unknown Filename"} | {track.collection || "Unknown Collection"}
+          {track.filename || "Unknown Filename"} |{" "}
+          {track.collection === "Unknown" ? "Extra" : track.collection || "Unknown Collection"}
         </p>
       </div>
 

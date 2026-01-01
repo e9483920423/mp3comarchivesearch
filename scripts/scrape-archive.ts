@@ -14,7 +14,6 @@ interface Track {
   collection: string
 }
 
-// Read the mp3index.txt file
 const mp3IndexPath = path.join(process.cwd(), "mp3index.txt")
 const urls = fs
   .readFileSync(mp3IndexPath, "utf-8")
@@ -25,7 +24,6 @@ console.log(`Found ${urls.length} URLs to scrape`)
 
 const allTracks: Track[] = []
 
-// Function to fetch HTML from Archive.org
 function fetchHTML(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     https
@@ -44,10 +42,7 @@ function fetchHTML(url: string): Promise<string> {
   })
 }
 
-// Function to check if file is a valid MP3
 function isValidMP3(filename: string): boolean {
-  // Only include files ending in .mp3
-  // Exclude: .afpk, .png, _spectrogram.png, etc.
   return (
     filename.toLowerCase().endsWith(".mp3") &&
     !filename.includes("_spectrogram") &&
@@ -58,28 +53,22 @@ function isValidMP3(filename: string): boolean {
   )
 }
 
-// Function to parse HTML and extract MP3 files
 function parseArchiveHTML(html: string, baseURL: string): Track[] {
   const tracks: Track[] = []
 
-  // Extract collection name from URL (e.g., "mp3_com_barge_A")
   const collectionMatch = baseURL.match(/mp3_com_barge_([A-Z])/)
   const collection = collectionMatch ? collectionMatch[1] : "Unknown"
 
-  // Simple regex to find MP3 file links
-  // Archive.org directory listings have links like: <a href="FILENAME.mp3">
   const linkRegex = /<a href="([^"]+)">([^<]+)<\/a>/gi
   let match
 
   while ((match = linkRegex.exec(html)) !== null) {
     const filename = match[1]
 
-    // Filter out non-MP3 files
     if (!isValidMP3(filename)) {
       continue
     }
 
-    // Extract metadata from filename
     const metadata = extractMetadataFromFilename(filename)
 
     tracks.push({
@@ -98,12 +87,10 @@ function parseArchiveHTML(html: string, baseURL: string): Track[] {
   return tracks
 }
 
-// Function to extract metadata from filename
 function extractMetadataFromFilename(filename: string) {
-  // Remove .mp3 extension and hash suffixes
   let name = filename.replace(/\.mp3$/i, "")
 
-  // Remove common hash patterns (e.g., _64kb_mp3, _128kb_mp3, etc.)
+  // Common hash patterns (_64kb_mp3, _128kb_mp3.)
   name = name.replace(/_\d+kb_mp3$/i, "")
   name = name.replace(/_[a-f0-9]{32}$/i, "") // MD5 hashes
   name = name.replace(/_[a-f0-9]{8}$/i, "") // Short hashes
@@ -134,7 +121,6 @@ function extractMetadataFromFilename(filename: string) {
     title = cleanString(parts.slice(1).join(" - "))
   } else if (name.includes("_")) {
     const parts = name.split("_")
-    // Only treat first part as artist if it's reasonably short
     if (parts[0].length < 30 && parts.length > 1) {
       artist = cleanString(parts[0])
       title = cleanString(parts.slice(1).join(" "))
@@ -158,7 +144,6 @@ function cleanString(str: string): string {
     .join(" ")
 }
 
-// Main scraping function
 async function scrapeAll() {
   console.log("Starting scrape process...")
   console.log("Filtering: Only .mp3 files (excluding .afpk, .png, _spectrogram, etc.)\n")
@@ -174,7 +159,6 @@ async function scrapeAll() {
       console.log(`  Found ${tracks.length} valid MP3 tracks`)
       allTracks.push(...tracks)
 
-      // Add delay to avoid overwhelming Archive.org
       await new Promise((resolve) => setTimeout(resolve, 1000))
     } catch (error) {
       console.error(`  Error scraping ${url}:`, error instanceof Error ? error.message : error)
@@ -183,7 +167,6 @@ async function scrapeAll() {
 
   console.log(`\nScraping complete! Total tracks: ${allTracks.length}`)
 
-  // Save to JSON file
   const dataDir = path.join(process.cwd(), "public", "data")
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true })

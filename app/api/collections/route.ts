@@ -44,6 +44,10 @@ const PREDEFINED_COLLECTIONS = [
   "Unknown",
 ]
 
+export function formatCollectionForDisplay(collection: string): string {
+  return collection === "Unknown" ? "Extra" : collection
+}
+
 export async function GET() {
   try {
     const supabase = await createClient()
@@ -97,8 +101,11 @@ export async function GET() {
 
     console.log(`[Collections API] Returning ${sortedCollections.length} collections`)
 
+    // Format collection names for display
+    const formattedCollections = sortedCollections.map(formatCollectionForDisplay)
+
     return NextResponse.json({
-      collections: sortedCollections,
+      collections: formattedCollections,
     })
   } catch (error) {
     console.error("Error fetching collections:", error)
