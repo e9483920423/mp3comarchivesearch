@@ -145,7 +145,7 @@ function cleanString(str: string): string {
 }
 
 async function scrapeAll() {
-  console.log("Starting scrape process...")
+  console.log("Starting process...")
   console.log("Filtering: Only .mp3 files (excluding .afpk, .png, _spectrogram, etc.)\n")
 
   for (let i = 0; i < urls.length; i++) {
@@ -156,7 +156,7 @@ async function scrapeAll() {
       const html = await fetchHTML(url)
       const tracks = parseArchiveHTML(html, url)
 
-      console.log(`  Found ${tracks.length} valid MP3 tracks`)
+      console.log(`  Found ${tracks.length} valid .MP3 tracks`)
       allTracks.push(...tracks)
 
       await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -165,7 +165,7 @@ async function scrapeAll() {
     }
   }
 
-  console.log(`\nScraping complete! Total tracks: ${allTracks.length}`)
+  console.log(`\nScraping complete. Total tracks: ${allTracks.length}`)
 
   const dataDir = path.join(process.cwd(), "public", "data")
   if (!fs.existsSync(dataDir)) {
@@ -177,5 +177,4 @@ async function scrapeAll() {
   console.log(`Saved to ${outputPath}`)
 }
 
-// Run the scraper
 scrapeAll().catch(console.error)

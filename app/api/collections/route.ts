@@ -8,7 +8,6 @@ const PREDEFINED_COLLECTIONS = [
   "F",
   "0",
   "H",
-  "Y",
   "S",
   "G",
   "K",
@@ -20,12 +19,9 @@ const PREDEFINED_COLLECTIONS = [
   "M-2",
   "S-2",
   "T",
-  "X",
   "B-2",
   "D-2",
   "P-2",
-  "W",
-  "Z",
   "F-2",
   "M",
   "Q",
@@ -36,7 +32,6 @@ const PREDEFINED_COLLECTIONS = [
   "C-2",
   "R",
   "T-2",
-  "W-2",
   "J",
   "U",
   "V",
@@ -47,8 +42,6 @@ const PREDEFINED_COLLECTIONS = [
 export async function GET() {
   try {
     const supabase = await createClient()
-
-    // Get distinct collections from tracks table to see which have data
     const { data: dbCollections, error } = await supabase
       .from("tracks")
       .select("collection")
@@ -58,15 +51,9 @@ export async function GET() {
     if (error) {
       console.error("Error fetching collections from database:", error)
     }
-
-    // Extract unique collection names from database
     const dbUniqueCollections = Array.from(new Set(dbCollections?.map((c) => c.collection) || []))
-
     const allCollections = Array.from(new Set([...PREDEFINED_COLLECTIONS, ...dbUniqueCollections]))
-
-    // Sort collections: numbers first, then letters, handling -2 suffixes
     const sortedCollections = allCollections.sort((a, b) => {
-      // Extract base and suffix
       const getCollectionParts = (col: string) => {
         const match = col.match(/^(.+?)(-2)?$/)
         return match ? { base: match[1], suffix: match[2] || "" } : { base: col, suffix: "" }
@@ -74,20 +61,14 @@ export async function GET() {
 
       const aParts = getCollectionParts(a)
       const bParts = getCollectionParts(b)
-
-      // If bases are the same, sort by suffix (no suffix before -2)
       if (aParts.base === bParts.base) {
         return aParts.suffix.localeCompare(bParts.suffix)
       }
 
-      // Numbers before letters
       const aIsNum = /^\d+$/.test(aParts.base)
       const bIsNum = /^\d+$/.test(bParts.base)
-
       if (aIsNum && !bIsNum) return -1
       if (!aIsNum && bIsNum) return 1
-
-      // Both numbers or both letters - sort naturally
       if (aIsNum && bIsNum) {
         return Number.parseInt(aParts.base) - Number.parseInt(bParts.base)
       }

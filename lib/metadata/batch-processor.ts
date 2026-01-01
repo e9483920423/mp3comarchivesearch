@@ -15,9 +15,6 @@ interface ProcessedTrack {
   metadata_confidence: number
 }
 
-/**
- * Processes batch of tracks with enhanced metadata extraction
- */
 export async function processBatchMetadata(
   tracks: any[],
   options: {
@@ -36,8 +33,6 @@ export async function processBatchMetadata(
       let finalTitle = track.title || track.filename
       let metadataSource: "id3" | "filename" | "fallback" = "filename"
       let confidence = 0.7
-
-      // Step 1: Try ID3 extraction
       if (extractID3) {
         const id3 = await extractID3Metadata(track.url)
         if (id3.artist || id3.title) {
@@ -48,14 +43,12 @@ export async function processBatchMetadata(
         }
       }
 
-      // Step 2: Normalize artist name
       if (normalizeArtists) {
         const normalized = normalizeArtist(finalArtist)
         finalArtist = normalized.name
         confidence = Math.max(confidence, normalized.confidence)
       }
 
-      // Step 3: Format title
       if (formatTitles) {
         finalTitle = formatTrackTitle({
           artist: finalArtist,
@@ -85,9 +78,6 @@ export async function processBatchMetadata(
   return processed
 }
 
-/**
- * Saves processed tracks to database with metadata tracking
- */
 export async function saveProcessedTracks(
   tracks: ProcessedTrack[],
   options: { batchSize?: number } = {},

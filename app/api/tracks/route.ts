@@ -36,7 +36,6 @@ export async function GET(request: Request) {
         countQuery = countQuery.ilike("title", searchTerm)
         tracksQuery = tracksQuery.ilike("title", searchTerm)
       } else {
-        // Search both artist and title
         countQuery = countQuery.or(`artist.ilike.%${query.trim()}%,title.ilike.%${query.trim()}%`)
         tracksQuery = tracksQuery.or(`artist.ilike.%${query.trim()}%,title.ilike.%${query.trim()}%`)
       }
@@ -105,8 +104,6 @@ export async function GET(request: Request) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[finalTracks[i], finalTracks[j]] = [finalTracks[j], finalTracks[i]]
       }
-
-      // Limit to requested page size
       finalTracks = finalTracks.slice(0, limit)
     }
 

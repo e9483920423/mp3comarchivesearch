@@ -43,7 +43,6 @@ export async function createServiceRoleClient() {
         try {
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         } catch {
-          // Ignore cookie errors in server components
         }
       },
     },

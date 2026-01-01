@@ -11,17 +11,12 @@ export interface ID3Metadata {
   confidence: number
 }
 
-// ID3v2 header structure
 interface ID3Header {
   version: number
   flags: number
   size: number
 }
 
-/**
- * Extracts ID3 metadata from MP3 file
- * Reads only the ID3v2 header (first 10KB) to avoid downloading entire file
- */
 export async function extractID3Metadata(url: string): Promise<ID3Metadata> {
   try {
     const buffer = await fetchID3Header(url)
@@ -39,9 +34,6 @@ export async function extractID3Metadata(url: string): Promise<ID3Metadata> {
   }
 }
 
-/**
- * Fetches only first 100KB of MP3 file to extract ID3v2 tags
- */
 async function fetchID3Header(url: string, maxBytes = 102400): Promise<Buffer | null> {
   return new Promise((resolve, reject) => {
     const protocol = url.startsWith("https") ? https : http
@@ -72,14 +64,9 @@ async function fetchID3Header(url: string, maxBytes = 102400): Promise<Buffer | 
   })
 }
 
-/**
- * Parses ID3v2 tags from buffer
- * Supports ID3v2.3 and ID3v2.4
- */
 function parseID3Tags(buffer: Buffer): Partial<ID3Metadata> {
   const metadata: Partial<ID3Metadata> = {}
 
-  // Check ID3v2 header
   if (buffer.length < 10 || buffer.toString("ascii", 0, 3) !== "ID3") {
     return metadata
   }
@@ -90,11 +77,9 @@ function parseID3Tags(buffer: Buffer): Partial<ID3Metadata> {
   let offset = 10
   const limit = Math.min(header.size + 10, buffer.length)
 
-  // Parse frames
   while (offset + 4 < limit) {
     const frameID = buffer.toString("ascii", offset, offset + 4)
 
-    // ID3v2.4
     if (frameID[0] === "\u0000") break
 
     const frameSize = readSynchsafeInt(buffer, offset + 4)
@@ -102,7 +87,6 @@ function parseID3Tags(buffer: Buffer): Partial<ID3Metadata> {
 
     const frameData = buffer.slice(offset, offset + frameSize)
 
-    // Extract specific frames
     switch (frameID) {
       case "TPE1": // Artist
         metadata.artist = parseTextFrame(frameData)

@@ -12,7 +12,6 @@ interface Track {
   collection: string
 }
 
-// Function to check if file is a valid MP3
 function isValidMP3(filename: string): boolean {
   return (
     filename.toLowerCase().endsWith(".mp3") &&
@@ -24,7 +23,6 @@ function isValidMP3(filename: string): boolean {
   )
 }
 
-// Function to extract metadata from filename
 function extractMetadataFromFilename(filename: string) {
   let name = filename.replace(/\.mp3$/i, "")
 
@@ -73,16 +71,12 @@ function cleanString(str: string): string {
     .join(" ")
 }
 
-// Parse Archive.org HTML to extract MP3 links
 function parseArchiveHTML(html: string, baseURL: string): Track[] {
   const tracks: Track[] = []
 
-  // Extract collection name
   const collectionMatch = baseURL.match(/mp3[_-]com[_-](?:rescue[_-])?barge[_-]?([A-Z0-9-]*)/i)
   const collection = collectionMatch ? collectionMatch[1] || "Main" : "Unknown"
 
-  // Archive.org uses different HTML patterns, try multiple approaches
-  // Pattern 1: Standard href links
   const linkRegex = /<a\s+href="([^"]+\.mp3[^"]*)"/gi
   let match
 
@@ -127,8 +121,6 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createServiceRoleClient()
-
-    // Read mp3index.txt from public folder
     const indexResponse = await fetch(`${request.url.split("/api")[0]}/mp3index.txt`)
     if (!indexResponse.ok) {
       throw new Error("Failed to load mp3index.txt")
@@ -166,7 +158,6 @@ export async function GET(request: Request) {
         console.log(`Found ${tracks.length} valid MP3 tracks from ${url}`)
         allTracks.push(...tracks)
 
-        // Add delay to avoid overwhelming Archive.org
         await new Promise((resolve) => setTimeout(resolve, 1000))
       } catch (error) {
         const errorMsg = `Error scraping ${url}: ${error instanceof Error ? error.message : "Unknown error"}`

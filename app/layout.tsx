@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* Apply JetBrains Mono globally */}
+      {}
       <body className={jetbrains.className}>{children}</body>
     </html>
   )
