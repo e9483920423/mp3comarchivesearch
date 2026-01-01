@@ -47,7 +47,7 @@ export default function SearchInterface() {
         const isSearch = Boolean(query?.trim())
         const collectionsParam = selectedCollections.includes("all") ? "all" : selectedCollections.join(",")
 
-        console.log(`[v0] ${isSearch ? "Searching" : "Loading"} tracks...`, {
+        console.log(`${isSearch ? "Searching" : "Loading"} tracks...`, {
           page,
           query,
           searchBy,
@@ -76,17 +76,10 @@ export default function SearchInterface() {
         const data = await response.json()
         const trackData = data.tracks || []
 
-        console.log(`[v0] ${isSearch ? "Search returned" : "Loaded"} ${trackData.length} tracks (total: ${data.total})`)
+        console.log(`${isSearch ? "Search returned" : "Loaded"} ${trackData.length} tracks (total: ${data.total})`)
 
         if (append) {
-          setTracks((prev) => {
-            const existingIds = new Set(prev.map((t) => t.id))
-            const newTracks = trackData.filter((t: Track) => !existingIds.has(t.id))
-            console.log(
-              `[v0] Adding ${newTracks.length} new tracks (${trackData.length - newTracks.length} duplicates filtered)`,
-            )
-            return [...prev, ...newTracks]
-          })
+          setTracks((prev) => [...prev, ...trackData])
         } else {
           setTracks(trackData)
         }
@@ -174,10 +167,6 @@ export default function SearchInterface() {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
     setIsLoading(true)
     setCurrentPage(1)
-  }
-
-  const formatCollectionDisplay = (collection: string) => {
-    return collection === "Unknown" ? "Extra" : collection
   }
 
   if (isLoading) {
@@ -310,9 +299,7 @@ export default function SearchInterface() {
                       onChange={() => handleCollectionToggle(collection)}
                       className="w-4 h-4 text-red-600 accent-red-600 rounded cursor-pointer"
                     />
-                    <span className="text-sm text-black font-medium">
-                      Collection: {formatCollectionDisplay(collection)}
-                    </span>
+                    <span className="text-sm text-black font-medium">Collection: {collection}</span>
                   </label>
                 ))}
               </div>
@@ -328,7 +315,7 @@ export default function SearchInterface() {
                 onClick={() => handleCollectionToggle(collection)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors"
               >
-                {formatCollectionDisplay(collection)}
+                {collection}
                 <X className="w-3 h-3" />
               </button>
             ))}
