@@ -9,9 +9,18 @@ interface TrackCardProps {
   globalVolume: number
   currentlyPlayingId: string | null
   onTrackPlay: (trackId: string | null) => void
+  nextTrackId?: string | null
+  onPlayNext?: () => void
 }
 
-export default function TrackCard({ track, globalVolume, currentlyPlayingId, onTrackPlay }: TrackCardProps) {
+export default function TrackCard({
+  track,
+  globalVolume,
+  currentlyPlayingId,
+  onTrackPlay,
+  nextTrackId,
+  onPlayNext,
+}: TrackCardProps) {
   const [localVolume, setLocalVolume] = useState(100)
   const audioRef = useRef<HTMLAudioElement>(null)
 
@@ -42,16 +51,44 @@ export default function TrackCard({ track, globalVolume, currentlyPlayingId, onT
       }
     }
 
+    const handleEnded = () => {
+      console.log("[v0] Track ended:", track.id)
+      // Clear the currently playing track
+      onTrackPlay(null)
+
+      // Auto-play next track if available
+      if (nextTrackId && onPlayNext) {
+        console.log("[v0] Auto-playing next track:", nextTrackId)
+        setTimeout(() => {
+          onPlayNext()
+        }, 300) // Small delay for smooth transition
+      } else {
+        console.log("[v0] No next track available, playback stopped")
+      }
+    }
+
     audio.addEventListener("play", handlePlay)
     audio.addEventListener("pause", handlePause)
-    audio.addEventListener("ended", handlePause)
+    audio.addEventListener("ended", handleEnded)
 
     return () => {
       audio.removeEventListener("play", handlePlay)
       audio.removeEventListener("pause", handlePause)
-      audio.removeEventListener("ended", handlePause)
+      audio.removeEventListener("ended", handleEnded)
     }
-  }, [track.id, currentlyPlayingId, onTrackPlay])
+  }, [track.id, currentlyPlayingId, onTrackPlay, nextTrackId, onPlayNext])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (audio && currentlyPlayingId === track.id) {
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.log("[v0] Auto-play prevented:", error.message)
+        })
+      }
+    }
+  }, [currentlyPlayingId, track.id])
 
   return (
     <div className="group border border-gray-200/80 rounded-xl p-4 sm:p-5 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 bg-white/80 backdrop-blur-sm">

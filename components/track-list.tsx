@@ -7,9 +7,9 @@ interface TrackListProps {
   tracks: Track[]
   globalVolume: number
   onLoadMore?: () => void
-  hasMore?: boolean
-  isLoadingMore?: boolean
-  totalInDatabase?: number
+  hasMore: boolean
+  isLoadingMore: boolean
+  totalInDatabase: number
   currentlyPlayingId: string | null
   onTrackPlay: (trackId: string | null) => void
 }
@@ -25,6 +25,21 @@ export default function TrackList({
   onTrackPlay,
 }: TrackListProps) {
   const displayTracks = tracks
+
+  const getNextTrackId = (currentIndex: number): string | null => {
+    if (currentIndex < displayTracks.length - 1) {
+      return displayTracks[currentIndex + 1].id
+    }
+    return null // End of playlist
+  }
+
+  const handlePlayNext = (currentIndex: number) => {
+    const nextIndex = currentIndex + 1
+    if (nextIndex < displayTracks.length) {
+      const nextTrack = displayTracks[nextIndex]
+      onTrackPlay(nextTrack.id)
+    }
+  }
 
   if (tracks.length === 0) {
     return (
@@ -49,6 +64,8 @@ export default function TrackList({
             globalVolume={globalVolume}
             currentlyPlayingId={currentlyPlayingId}
             onTrackPlay={onTrackPlay}
+            nextTrackId={getNextTrackId(index)}
+            onPlayNext={() => handlePlayNext(index)}
           />
         ))}
 
