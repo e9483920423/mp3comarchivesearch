@@ -32,11 +32,8 @@ export default function TrackCard({
   }, [globalVolume, localVolume])
 
   useEffect(() => {
-    const audio = audioRef.current
-    if (audio) {
-      if (currentlyPlayingId !== track.id) {
-        audio.pause()
-      }
+    if (audioRef.current && currentlyPlayingId !== null && currentlyPlayingId !== track.id) {
+      audioRef.current.pause()
     }
   }, [currentlyPlayingId, track.id])
 
@@ -82,20 +79,11 @@ export default function TrackCard({
   useEffect(() => {
     const audio = audioRef.current
     if (audio && currentlyPlayingId === track.id) {
-      if (audio.paused || audio.ended) {
-        const allAudioElements = document.querySelectorAll<HTMLAudioElement>('audio')
-        allAudioElements.forEach((element) => {
-          if (element !== audio && element.src === audio.src && !element.paused) {
-            element.pause()
-          }
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.log("[v0] Auto-play prevented:", error.message)
         })
-        
-        const playPromise = audio.play()
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.log("[v0] Auto-play prevented:", error.message)
-          })
-        }
       }
     }
   }, [currentlyPlayingId, track.id])
