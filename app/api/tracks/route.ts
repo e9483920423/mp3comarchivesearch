@@ -62,49 +62,113 @@ export async function GET(request: Request) {
 
       finalTracks = tracks || []
     } else {
-      const numPagesToFetch = Math.min(2, totalPages)
-      const randomPages = new Set<number>()
+      if (collectionsParam === "all") {
+        console.log("[v0] All Collections selected - using diverse sampling algorithm")
 
-      while (randomPages.size < numPagesToFetch && randomPages.size < totalPages) {
-        const randomPage = Math.floor(Math.random() * totalPages) + 1
-        randomPages.add(randomPage)
-      }
+        // Get all unique collections from the database
+        const { data: collectionsData, error: collectionsError } = await supabase
+          .from("tracks")
+          .select("collection")
+          .not("collection", "is", null)
 
-      const mobileLimit = Math.min(limit, 100)
+        if (collectionsError) {
+          throw collectionsError
+        }
 
-      const fetchPromises = Array.from(randomPages).map(async (pageNum) => {
-        const pageOffset = (pageNum - 1) * mobileLimit
-        const pageQuery = supabase.from("tracks").select("*")
+        const uniqueCollections = Array.from(new Set(collectionsData?.map((c) => c.collection) || []))
+        console.log(`[v0] Found ${uniqueCollections.length} unique collections`)
 
-        if (collectionsParam !== "all") {
-          const collections = collectionsParam.split(",").filter(Boolean)
-          if (collections.length > 0) {
-            pageQuery.in("collection", collections)
+        const TARGET_TRACKS = 500
+        const tracksPerCollection = Math.ceil(TARGET_TRACKS / uniqueCollections.length)
+
+        // Fetch tracks from each collection in parallel
+        const collectionFetchPromises = uniqueCollections.map(async (collection) => {
+          const { data, error } = await supabase
+            .from("tracks")
+            .select("*")
+            .eq("collection", collection)
+            .order("id", { ascending: true })
+            .limit(tracksPerCollection)
+
+          if (error) {
+            console.error(`[v0] Error fetching from collection ${collection}:`, error)
+            return []
+          }
+
+          return data || []
+        })
+
+        const collectionResults = await Promise.all(collectionFetchPromises)
+
+        // Round-robin interleave tracks from each collection
+        const interleavedTracks: any[] = []
+        const maxLength = Math.max(...collectionResults.map((arr) => arr.length))
+
+        for (let i = 0; i < maxLength && interleavedTracks.length < TARGET_TRACKS; i++) {
+          for (const collectionTracks of collectionResults) {
+            if (i < collectionTracks.length && interleavedTracks.length < TARGET_TRACKS) {
+              interleavedTracks.push(collectionTracks[i])
+            }
           }
         }
 
-        pageQuery.order("id", { ascending: true })
+        console.log(
+          `[v0] Diverse sampling complete: ${interleavedTracks.length} tracks from ${uniqueCollections.length} collections`,
+        )
 
-        const { data, error } = await pageQuery.range(pageOffset, pageOffset + mobileLimit - 1)
-
-        if (error) {
-          return []
+        // Shuffle the interleaved tracks for more randomness
+        for (let i = interleavedTracks.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[interleavedTracks[i], interleavedTracks[j]] = [interleavedTracks[j], interleavedTracks[i]]
         }
 
-        return data || []
-      })
+        finalTracks = interleavedTracks.slice(0, Math.min(limit, TARGET_TRACKS))
+      } else {
+        // Existing logic for specific collections
+        const numPagesToFetch = Math.min(2, totalPages)
+        const randomPages = new Set<number>()
 
-      const timeoutPromise = new Promise<any[][]>((_, reject) => {
-        setTimeout(() => reject(new Error("Request timeout")), 25000)
-      })
-      const pagesData = await Promise.race([Promise.all(fetchPromises), timeoutPromise])
-      const combinedTracks = pagesData.flat()
-      finalTracks = [...combinedTracks]
-      for (let i = finalTracks.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[finalTracks[i], finalTracks[j]] = [finalTracks[j], finalTracks[i]]
+        while (randomPages.size < numPagesToFetch && randomPages.size < totalPages) {
+          const randomPage = Math.floor(Math.random() * totalPages) + 1
+          randomPages.add(randomPage)
+        }
+
+        const mobileLimit = Math.min(limit, 100)
+
+        const fetchPromises = Array.from(randomPages).map(async (pageNum) => {
+          const pageOffset = (pageNum - 1) * mobileLimit
+          const pageQuery = supabase.from("tracks").select("*")
+
+          if (collectionsParam !== "all") {
+            const collections = collectionsParam.split(",").filter(Boolean)
+            if (collections.length > 0) {
+              pageQuery.in("collection", collections)
+            }
+          }
+
+          pageQuery.order("id", { ascending: true })
+
+          const { data, error } = await pageQuery.range(pageOffset, pageOffset + mobileLimit - 1)
+
+          if (error) {
+            return []
+          }
+
+          return data || []
+        })
+
+        const timeoutPromise = new Promise<any[][]>((_, reject) => {
+          setTimeout(() => reject(new Error("Request timeout")), 25000)
+        })
+        const pagesData = await Promise.race([Promise.all(fetchPromises), timeoutPromise])
+        const combinedTracks = pagesData.flat()
+        finalTracks = [...combinedTracks]
+        for (let i = finalTracks.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[finalTracks[i], finalTracks[j]] = [finalTracks[j], finalTracks[i]]
+        }
+        finalTracks = finalTracks.slice(0, limit)
       }
-      finalTracks = finalTracks.slice(0, limit)
     }
 
     return NextResponse.json({
