@@ -63,7 +63,7 @@ export async function GET(request: Request) {
       finalTracks = tracks || []
     } else {
       if (collectionsParam === "all") {
-        console.log("[v0] All Collections selected - using diverse sampling algorithm")
+        console.log(`[v0] All Collections selected - using paginated random sampling (page ${page})`)
 
         // Get all unique collections from the database
         const { data: collectionsData, error: collectionsError } = await supabase
@@ -78,17 +78,20 @@ export async function GET(request: Request) {
         const uniqueCollections = Array.from(new Set(collectionsData?.map((c) => c.collection) || []))
         console.log(`[v0] Found ${uniqueCollections.length} unique collections`)
 
-        const TARGET_TRACKS = 500
-        const tracksPerCollection = Math.ceil(TARGET_TRACKS / uniqueCollections.length)
+        // Calculate how many tracks to fetch per collection for this page
+        const tracksPerCollection = Math.ceil(limit / uniqueCollections.length)
 
-        // Fetch tracks from each collection in parallel
+        // Use page number to create an offset for each collection
+        const collectionOffset = (page - 1) * tracksPerCollection
+
+        // Fetch tracks from each collection in parallel with offset
         const collectionFetchPromises = uniqueCollections.map(async (collection) => {
           const { data, error } = await supabase
             .from("tracks")
             .select("*")
             .eq("collection", collection)
             .order("id", { ascending: true })
-            .limit(tracksPerCollection)
+            .range(collectionOffset, collectionOffset + tracksPerCollection - 1)
 
           if (error) {
             console.error(`[v0] Error fetching from collection ${collection}:`, error)
@@ -104,27 +107,28 @@ export async function GET(request: Request) {
         const interleavedTracks: any[] = []
         const maxLength = Math.max(...collectionResults.map((arr) => arr.length))
 
-        for (let i = 0; i < maxLength && interleavedTracks.length < TARGET_TRACKS; i++) {
+        for (let i = 0; i < maxLength; i++) {
           for (const collectionTracks of collectionResults) {
-            if (i < collectionTracks.length && interleavedTracks.length < TARGET_TRACKS) {
+            if (i < collectionTracks.length) {
               interleavedTracks.push(collectionTracks[i])
             }
           }
         }
 
         console.log(
-          `[v0] Diverse sampling complete: ${interleavedTracks.length} tracks from ${uniqueCollections.length} collections`,
+          `[v0] Page ${page} sampling: ${interleavedTracks.length} tracks from ${uniqueCollections.length} collections`,
         )
 
-        // Shuffle the interleaved tracks for more randomness
+        // Shuffle the interleaved tracks for randomness
         for (let i = interleavedTracks.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1))
           ;[interleavedTracks[i], interleavedTracks[j]] = [interleavedTracks[j], interleavedTracks[i]]
         }
 
-        finalTracks = interleavedTracks.slice(0, Math.min(limit, TARGET_TRACKS))
+        finalTracks = interleavedTracks.slice(0, limit)
       } else {
-        // Existing logic for specific collections
+        console.log("[v0] Specific Collections selected - using random sampling from specified collections")
+
         const numPagesToFetch = Math.min(2, totalPages)
         const randomPages = new Set<number>()
 
