@@ -63,33 +63,102 @@ export async function GET(request: Request) {
 
       finalTracks = tracks || []
     } else if (collectionsParam === "all") {
-      // All Collections mode: fetch random tracks using random ID sampling
-      console.log(`[v0] All Collections - fetching ${limit} random tracks for page ${page}`)
+      console.log(`[v0] All Collections - round-robin sampling ${limit} tracks for page ${page}`)
 
-      // Use a seed based on the page number for consistent but different results per page
-      const seed = page * 12345
-
-      // Fetch tracks using random sampling with ORDER BY RANDOM()
-      // We use a seeded approach by combining page number with modulo on ID
-      const { data: tracks, error: tracksError } = await supabase
+      // Fetch all unique collections from the database
+      const { data: collectionsData, error: collectionsError } = await supabase
         .from("tracks")
-        .select("*")
-        .order("id", { ascending: true })
-        .range(offset, offset + limit - 1)
+        .select("collection")
+        .not("collection", "is", null)
 
-      if (tracksError) {
-        throw tracksError
+      if (collectionsError) {
+        throw collectionsError
       }
 
-      // Shuffle the results for additional randomness
-      const shuffledTracks = tracks || []
-      for (let i = shuffledTracks.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[shuffledTracks[i], shuffledTracks[j]] = [shuffledTracks[j], shuffledTracks[i]]
+      const uniqueCollections = Array.from(new Set(collectionsData?.map((c) => c.collection) || []))
+      console.log(`[v0] Found ${uniqueCollections.length} unique collections`)
+
+      if (uniqueCollections.length === 0) {
+        return NextResponse.json({
+          tracks: [],
+          total: 0,
+          page,
+          limit,
+          hasMore: false,
+          query: null,
+          searchBy: null,
+          collections: collectionsParam,
+          sortOrder,
+        })
       }
 
-      finalTracks = shuffledTracks
-      console.log(`[v0] Fetched ${finalTracks.length} tracks for page ${page}`)
+      // Calculate which "round" of collections we're in based on page
+      // If we have 35 collections and want 500 tracks per page:
+      // - Page 1: Get ~14 tracks from each collection (14 * 35 = 490, then 10 more from first collections)
+      // - Page 2: Continue from where we left off
+      const globalStartIndex = (page - 1) * limit
+      const tracksPerRound = uniqueCollections.length
+
+      // Calculate starting round and position within the round
+      const startRound = Math.floor(globalStartIndex / tracksPerRound)
+      const positionInRound = globalStartIndex % tracksPerRound
+
+      console.log(`[v0] Starting at global index ${globalStartIndex}, round ${startRound}, position ${positionInRound}`)
+
+      // Fetch tracks from each collection with proper offset
+      const collectionPromises = uniqueCollections.map(async (collection, collectionIndex) => {
+        // Calculate how many tracks this collection should contribute
+        const tracksNeeded = Math.ceil(limit / uniqueCollections.length)
+
+        // Adjust for position in round if we're starting mid-round
+        let collectionOffset = startRound
+        if (collectionIndex < positionInRound) {
+          collectionOffset = startRound + 1
+        }
+
+        // Fetch tracks from this collection
+        const { data: tracks, error } = await supabase
+          .from("tracks")
+          .select("*")
+          .eq("collection", collection)
+          .order("id", { ascending: true })
+          .range(collectionOffset, collectionOffset + tracksNeeded - 1)
+
+        if (error) {
+          console.error(`[v0] Error fetching from collection ${collection}:`, error)
+          return []
+        }
+
+        return (tracks || []).map((track: any) => ({ ...track, _collectionIndex: collectionIndex }))
+      })
+
+      // Fetch all collections in parallel
+      const collectionResults = await Promise.all(collectionPromises)
+      const allFetchedTracks = collectionResults.flat()
+
+      console.log(`[v0] Fetched ${allFetchedTracks.length} total tracks from all collections`)
+
+      // Round-robin interleave: pick one track from each collection in sequence
+      const interleavedTracks: any[] = []
+      const maxRounds = Math.max(...collectionResults.map((tracks) => tracks.length))
+
+      for (let round = 0; round < maxRounds && interleavedTracks.length < limit; round++) {
+        for (let collectionIndex = 0; collectionIndex < uniqueCollections.length; collectionIndex++) {
+          // Adjust starting point if we're in the middle of a round
+          const adjustedCollectionIndex = (collectionIndex + positionInRound) % uniqueCollections.length
+          const tracks = collectionResults[adjustedCollectionIndex]
+
+          if (tracks && tracks[round]) {
+            interleavedTracks.push(tracks[round])
+            if (interleavedTracks.length >= limit) break
+          }
+        }
+      }
+
+      // Remove temporary collection index marker
+      finalTracks = interleavedTracks.map(({ _collectionIndex, ...track }) => track).slice(0, limit)
+
+      console.log(`[v0] Returning ${finalTracks.length} interleaved tracks for page ${page}`)
     } else {
       // Specific collections: random sampling from those collections
       console.log("[v0] Specific Collections - using random sampling from specified collections")
