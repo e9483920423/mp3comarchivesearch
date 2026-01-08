@@ -30,7 +30,7 @@ export default function TrackList({
     if (currentIndex < displayTracks.length - 1) {
       return displayTracks[currentIndex + 1].id
     }
-    return null 
+    return null
   }
 
   const handlePlayNext = (currentIndex: number) => {
@@ -59,7 +59,7 @@ export default function TrackList({
       <div className="space-y-3 sm:space-y-4 overflow-y-auto">
         {displayTracks.map((track, index) => (
           <TrackCard
-            key={`${track.url}-${index}`}
+            key={track.id}
             track={track}
             globalVolume={globalVolume}
             currentlyPlayingId={currentlyPlayingId}

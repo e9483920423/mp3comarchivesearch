@@ -59,7 +59,7 @@ export default function TrackCard({
         console.log("[v0] Auto-playing next track:", nextTrackId)
         setTimeout(() => {
           onPlayNext()
-        }, 300) 
+        }, 300)
       } else {
         console.log("[v0] No next track available, playback stopped")
       }
@@ -75,6 +75,17 @@ export default function TrackCard({
       audio.removeEventListener("ended", handleEnded)
     }
   }, [track.id, currentlyPlayingId, onTrackPlay, nextTrackId, onPlayNext])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    return () => {
+      if (audio) {
+        audio.pause()
+        audio.currentTime = 0
+        audio.src = ""
+      }
+    }
+  }, [track.id])
 
   useEffect(() => {
     const audio = audioRef.current

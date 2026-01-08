@@ -47,12 +47,13 @@ export default function SearchInterface() {
         const isSearch = Boolean(query?.trim())
         const collectionsParam = selectedCollections.includes("all") ? "all" : selectedCollections.join(",")
 
-        console.log(`${isSearch ? "Searching" : "Loading"} tracks...`, {
+        console.log(`[v0] ${isSearch ? "Searching" : "Loading"} tracks...`, {
           page,
           query,
           searchBy,
           collections: collectionsParam,
           sortOrder,
+          append,
         })
 
         const params = new URLSearchParams({
@@ -76,11 +77,20 @@ export default function SearchInterface() {
         const data = await response.json()
         const trackData = data.tracks || []
 
-        console.log(`${isSearch ? "Search returned" : "Loaded"} ${trackData.length} tracks (total: ${data.total})`)
+        console.log(`[v0] ${isSearch ? "Search returned" : "Loaded"} ${trackData.length} tracks (total: ${data.total})`)
 
         if (append) {
-          setTracks((prev) => [...prev, ...trackData])
+          setTracks((prev) => {
+            const existingIds = new Set(prev.map((t) => t.id))
+            const newTracks = trackData.filter((track: Track) => !existingIds.has(track.id))
+            console.log(
+              `[v0] Appending ${newTracks.length} new tracks (${trackData.length - newTracks.length} duplicates filtered)`,
+            )
+            return [...prev, ...newTracks]
+          })
         } else {
+          console.log(`[v0] Replacing tracks, stopping current playback`)
+          setCurrentlyPlayingId(null)
           setTracks(trackData)
         }
 
@@ -90,7 +100,7 @@ export default function SearchInterface() {
         setIsSearching(isSearch)
         setIsLoading(false)
       } catch (err) {
-        console.error("Error loading tracks:", err)
+        console.error("[v0] Error loading tracks:", err)
         setError(err instanceof Error ? err.message : "Failed to load tracks")
         setIsLoading(false)
       }
@@ -117,6 +127,7 @@ export default function SearchInterface() {
   async function loadMoreTracks() {
     if (isLoadingMore || !hasMore) return
 
+    console.log("[v0] Loading more tracks...")
     setIsLoadingMore(true)
     try {
       const nextPage = currentPage + 1
@@ -127,7 +138,7 @@ export default function SearchInterface() {
         true,
       )
     } catch (err) {
-      console.error("Error loading more tracks:", err)
+      console.error("[v0] Error loading more tracks:", err)
     } finally {
       setIsLoadingMore(false)
     }
@@ -139,12 +150,10 @@ export default function SearchInterface() {
         return ["all"]
       }
 
-      // If "all" is currently selected, replace it with the clicked collection
       if (prev.includes("all")) {
         return [collection]
       }
 
-      // Toggle the collection
       if (prev.includes(collection)) {
         const newSelections = prev.filter((c) => c !== collection)
         return newSelections.length === 0 ? ["all"] : newSelections
@@ -153,18 +162,24 @@ export default function SearchInterface() {
       }
     })
 
+    console.log("[v0] Collection filter changed, resetting playback")
+    setCurrentlyPlayingId(null)
     setIsLoading(true)
     setCurrentPage(1)
   }
 
   function handleClearFilters() {
     setSelectedCollections(["all"])
+    console.log("[v0] Filters cleared, resetting playback")
+    setCurrentlyPlayingId(null)
     setIsLoading(true)
     setCurrentPage(1)
   }
 
   function handleSortOrderToggle() {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+    console.log("[v0] Sort order changed, resetting playback")
+    setCurrentlyPlayingId(null)
     setIsLoading(true)
     setCurrentPage(1)
   }
